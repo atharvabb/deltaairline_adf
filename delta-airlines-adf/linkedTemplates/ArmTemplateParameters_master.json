@@ -1,0 +1,42 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "delta-airlines-adf"
+		},
+		"ls_azure_sql_database_connectionString": {
+			"value": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=deltaair1.database.windows.net;Initial Catalog=deltaairdb;User ID=deltaair"
+		},
+		"AzureBlobStorage1_properties_typeProperties_serviceEndpoint": {
+			"value": "https://deltaairlineblobstorage.blob.core.windows.net/"
+		},
+		"AzureBlobStorage1_properties_typeProperties_tenant": {
+			"value": "8aa62754-c26c-41ca-b730-a3cb74011794"
+		},
+		"AzureBlobStorage1_properties_typeProperties_servicePrincipalId": {
+			"value": "14d976df-4267-4fd0-8afb-05682a022d5e"
+		},
+		"delta_airline_keyvault_properties_typeProperties_baseUrl": {
+			"value": "https://delta-airline-keyvault.vault.azure.net/"
+		},
+		"ls_deltaair_raw_datalake_properties_typeProperties_url": {
+			"value": "https://deltaairlinedatalake.dfs.core.windows.net/"
+		},
+		"ls_deltaair_raw_datalake_properties_typeProperties_tenant": {
+			"value": "8aa62754-c26c-41ca-b730-a3cb74011794"
+		},
+		"ls_deltaair_raw_datalake_properties_typeProperties_servicePrincipalId": {
+			"value": "14d976df-4267-4fd0-8afb-05682a022d5e"
+		},
+		"ls_rest_api_properties_typeProperties_url": {
+			"value": "https://airlabs.co/api/v9/airlines"
+		},
+		"containerUri": {
+			"value": ""
+		},
+		"containerSasToken": {
+			"value": ""
+		}
+	}
+}

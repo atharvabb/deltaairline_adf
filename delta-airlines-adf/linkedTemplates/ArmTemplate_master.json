@@ -1,0 +1,106 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "delta-airlines-adf"
+		},
+		"ls_azure_sql_database_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'ls_azure_sql_database'",
+			"defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=deltaair1.database.windows.net;Initial Catalog=deltaairdb;User ID=deltaair"
+		},
+		"AzureBlobStorage1_properties_typeProperties_serviceEndpoint": {
+			"type": "string",
+			"defaultValue": "https://deltaairlineblobstorage.blob.core.windows.net/"
+		},
+		"AzureBlobStorage1_properties_typeProperties_tenant": {
+			"type": "string",
+			"defaultValue": "8aa62754-c26c-41ca-b730-a3cb74011794"
+		},
+		"AzureBlobStorage1_properties_typeProperties_servicePrincipalId": {
+			"type": "string",
+			"defaultValue": "14d976df-4267-4fd0-8afb-05682a022d5e"
+		},
+		"delta_airline_keyvault_properties_typeProperties_baseUrl": {
+			"type": "string",
+			"defaultValue": "https://delta-airline-keyvault.vault.azure.net/"
+		},
+		"ls_deltaair_raw_datalake_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://deltaairlinedatalake.dfs.core.windows.net/"
+		},
+		"ls_deltaair_raw_datalake_properties_typeProperties_tenant": {
+			"type": "string",
+			"defaultValue": "8aa62754-c26c-41ca-b730-a3cb74011794"
+		},
+		"ls_deltaair_raw_datalake_properties_typeProperties_servicePrincipalId": {
+			"type": "string",
+			"defaultValue": "14d976df-4267-4fd0-8afb-05682a022d5e"
+		},
+		"ls_rest_api_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://airlabs.co/api/v9/airlines"
+		},
+		"containerUri": {
+			"type": "string",
+			"metadata": "URI to storage account containing linked ARM templates"
+		},
+		"containerSasToken": {
+			"type": "string",
+			"metadata": "Sas token to storage account containing linked ARM templates"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "delta-airlines-adf_ArmTemplate_0",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2018-02-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_0.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					},
+					"ls_azure_sql_database_connectionString": {
+						"value": "[parameters('ls_azure_sql_database_connectionString')]"
+					},
+					"delta_airline_keyvault_properties_typeProperties_baseUrl": {
+						"value": "[parameters('delta_airline_keyvault_properties_typeProperties_baseUrl')]"
+					},
+					"ls_rest_api_properties_typeProperties_url": {
+						"value": "[parameters('ls_rest_api_properties_typeProperties_url')]"
+					},
+					"AzureBlobStorage1_properties_typeProperties_serviceEndpoint": {
+						"value": "[parameters('AzureBlobStorage1_properties_typeProperties_serviceEndpoint')]"
+					},
+					"AzureBlobStorage1_properties_typeProperties_tenant": {
+						"value": "[parameters('AzureBlobStorage1_properties_typeProperties_tenant')]"
+					},
+					"AzureBlobStorage1_properties_typeProperties_servicePrincipalId": {
+						"value": "[parameters('AzureBlobStorage1_properties_typeProperties_servicePrincipalId')]"
+					},
+					"ls_deltaair_raw_datalake_properties_typeProperties_url": {
+						"value": "[parameters('ls_deltaair_raw_datalake_properties_typeProperties_url')]"
+					},
+					"ls_deltaair_raw_datalake_properties_typeProperties_tenant": {
+						"value": "[parameters('ls_deltaair_raw_datalake_properties_typeProperties_tenant')]"
+					},
+					"ls_deltaair_raw_datalake_properties_typeProperties_servicePrincipalId": {
+						"value": "[parameters('ls_deltaair_raw_datalake_properties_typeProperties_servicePrincipalId')]"
+					}
+				}
+			},
+			"dependsOn": []
+		}
+	]
+}
