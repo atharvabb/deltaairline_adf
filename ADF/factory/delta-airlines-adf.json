@@ -1,0 +1,9 @@
+{
+	"name": "delta-airlines-adf",
+	"location": "eastus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "d569a9b8-b21c-4379-b7a5-c2044418d86d",
+		"tenantId": "8aa62754-c26c-41ca-b730-a3cb74011794"
+	}
+}

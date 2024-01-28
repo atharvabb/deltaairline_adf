@@ -1,0 +1,22 @@
+{
+	"name": "ls_deltaair_raw_datalake",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "AzureBlobFS",
+		"typeProperties": {
+			"url": "https://deltaairlinedatalake.dfs.core.windows.net/",
+			"tenant": "8aa62754-c26c-41ca-b730-a3cb74011794",
+			"servicePrincipalId": "14d976df-4267-4fd0-8afb-05682a022d5e",
+			"servicePrincipalCredentialType": "ServicePrincipalKey",
+			"servicePrincipalCredential": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "delta_airline_keyvault",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "delta-air-blob-client-app-secret"
+			}
+		}
+	}
+}

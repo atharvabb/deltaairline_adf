@@ -1,0 +1,24 @@
+{
+	"name": "ds_rest_api_airlabs",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_rest_api",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"relative_path": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "RestResource",
+		"typeProperties": {
+			"relativeUrl": {
+				"value": "@dataset().relative_path",
+				"type": "Expression"
+			}
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

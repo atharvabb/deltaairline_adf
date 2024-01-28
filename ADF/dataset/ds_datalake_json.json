@@ -1,0 +1,34 @@
+{
+	"name": "ds_datalake_json",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_deltaair_raw_datalake",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"dir": {
+				"type": "string"
+			},
+			"finename": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": {
+					"value": "@dataset().finename",
+					"type": "Expression"
+				},
+				"fileSystem": {
+					"value": "@dataset().dir",
+					"type": "Expression"
+				}
+			}
+		},
+		"schema": {}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

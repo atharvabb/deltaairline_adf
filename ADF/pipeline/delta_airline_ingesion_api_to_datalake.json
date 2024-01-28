@@ -1,0 +1,97 @@
+{
+	"name": "delta_airline_ingesion_api_to_datalake",
+	"properties": {
+		"activities": [
+			{
+				"name": "get_secure_api_link",
+				"type": "WebActivity",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"method": "GET",
+					"url": "https://delta-airline-keyvault.vault.azure.net/secrets/airlabs-api-key/78040dc69f5e4b5e96393e1ae9091494?api-version=7.0",
+					"authentication": {
+						"type": "MSI",
+						"resource": "https://vault.azure.net"
+					}
+				}
+			},
+			{
+				"name": "Copy data1",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "get_secure_api_link",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "RestSource",
+						"httpRequestTimeout": "00:01:40",
+						"requestInterval": "00.00:00:00.010",
+						"requestMethod": "GET"
+					},
+					"sink": {
+						"type": "JsonSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "JsonWriteSettings"
+						}
+					},
+					"enableStaging": false
+				},
+				"inputs": [
+					{
+						"referenceName": "ds_rest_api_airlabs",
+						"type": "DatasetReference",
+						"parameters": {
+							"relative_path": {
+								"value": "@activity('get_secure_api_link').output.value",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ds_datalake_json",
+						"type": "DatasetReference",
+						"parameters": {
+							"dir": {
+								"value": "@concat('delta-air-raw-zone/api-data/dw_load_date=',formatDateTime(utcNow(),'yyyy-MM-dd'))",
+								"type": "Expression"
+							},
+							"finename": {
+								"value": "@concat('airlabs_api_data',formatDateTime(utcNow(),'yyyy-MM-dd'))",
+								"type": "Expression"
+							}
+						}
+					}
+				]
+			}
+		],
+		"annotations": [],
+		"lastPublishTime": "2024-01-28T10:03:02Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}
