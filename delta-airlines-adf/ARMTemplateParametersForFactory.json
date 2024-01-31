@@ -31,6 +31,9 @@
 		},
 		"ls_rest_api_properties_typeProperties_url": {
 			"value": "https://airlabs.co/api/v9/airlines"
+		},
+		"ls_AzureDatabricks_properties_typeProperties_existingClusterId": {
+			"value": "0128-115236-sjfsekx6"
 		}
 	}
 }

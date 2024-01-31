@@ -43,6 +43,10 @@
 		"ls_deltaair_raw_datalake_properties_typeProperties_servicePrincipalId": {
 			"type": "string",
 			"defaultValue": "14d976df-4267-4fd0-8afb-05682a022d5e"
+		},
+		"ls_AzureDatabricks_properties_typeProperties_existingClusterId": {
+			"type": "string",
+			"defaultValue": "0128-115236-sjfsekx6"
 		}
 	},
 	"variables": {
@@ -175,6 +179,54 @@
 							"type": "LinkedServiceReference"
 						},
 						"secretName": "delta-air-blob-client-app-secret"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/delta_airline_keyvault')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ls_AzureDatabricks')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureDatabricks",
+				"typeProperties": {
+					"domain": "https://adb-687768538906932.12.azuredatabricks.net",
+					"accessToken": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "delta_airline_keyvault",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": "databricks-adf-token"
+					},
+					"existingClusterId": "[parameters('ls_AzureDatabricks_properties_typeProperties_existingClusterId')]"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/delta_airline_keyvault')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ls_DeltaLake')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureDatabricksDeltaLake",
+				"typeProperties": {
+					"domain": "https://adb-687768538906932.12.azuredatabricks.net",
+					"clusterId": "0128-115236-sjfsekx6",
+					"accessToken": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "delta_airline_keyvault",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": "databricks-adf-token"
 					}
 				}
 			},
@@ -516,6 +568,124 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/ds_deltalake_final_table')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_DeltaLake",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureDatabricksDeltaLakeDataset",
+				"typeProperties": {
+					"database": "deltadb",
+					"table": "app_view"
+				},
+				"schema": [
+					{
+						"name": "FlightNum",
+						"type": "integer"
+					},
+					{
+						"name": "aircraft_type",
+						"type": "string"
+					},
+					{
+						"name": "manufacturer",
+						"type": "string"
+					},
+					{
+						"name": "origin_city",
+						"type": "string"
+					},
+					{
+						"name": "origin_country",
+						"type": "string"
+					},
+					{
+						"name": "dest_city",
+						"type": "string"
+					},
+					{
+						"name": "dest_country",
+						"type": "string"
+					},
+					{
+						"name": "is_delayed",
+						"type": "integer"
+					},
+					{
+						"name": "dw_load_date",
+						"type": "date"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_DeltaLake')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureSqlTable1')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_azure_sql_database",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "FlightNum",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "aircraft_type",
+						"type": "varchar"
+					},
+					{
+						"name": "manufacturer",
+						"type": "varchar"
+					},
+					{
+						"name": "origin_city",
+						"type": "varchar"
+					},
+					{
+						"name": "origin_country",
+						"type": "varchar"
+					},
+					{
+						"name": "dest_city",
+						"type": "varchar"
+					},
+					{
+						"name": "dest_country",
+						"type": "varchar"
+					},
+					{
+						"name": "is_delayed",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "dw_load_date",
+						"type": "date"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "app_view"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_azure_sql_database')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/delta_airline_ingesion_api_to_datalake')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -619,447 +789,6 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/ds_rest_api_airlabs')]",
 				"[concat(variables('factoryId'), '/datasets/ds_datalake_json')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/delta_airline_ingesion_blob_to_datalake')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Lookup1",
-						"type": "Lookup",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "JsonSource",
-								"storeSettings": {
-									"type": "AzureBlobStorageReadSettings",
-									"recursive": false,
-									"enablePartitionDiscovery": false
-								},
-								"formatSettings": {
-									"type": "JsonReadSettings"
-								}
-							},
-							"dataset": {
-								"referenceName": "ds_lookup_blob_to_dlake_config_file",
-								"type": "DatasetReference",
-								"parameters": {}
-							},
-							"firstRowOnly": false
-						}
-					},
-					{
-						"name": "ForEach1",
-						"type": "ForEach",
-						"dependsOn": [
-							{
-								"activity": "Lookup1",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('Lookup1').output.value",
-								"type": "Expression"
-							},
-							"isSequential": true,
-							"activities": [
-								{
-									"name": "If Condition1",
-									"type": "IfCondition",
-									"dependsOn": [],
-									"userProperties": [],
-									"typeProperties": {
-										"expression": {
-											"value": "@equals(item().file_type,'zip')",
-											"type": "Expression"
-										},
-										"ifFalseActivities": [
-											{
-												"name": "blob to dake copy",
-												"type": "Copy",
-												"dependsOn": [],
-												"policy": {
-													"timeout": "0.12:00:00",
-													"retry": 0,
-													"retryIntervalInSeconds": 30,
-													"secureOutput": false,
-													"secureInput": false
-												},
-												"userProperties": [],
-												"typeProperties": {
-													"source": {
-														"type": "BinarySource",
-														"storeSettings": {
-															"type": "AzureBlobStorageReadSettings",
-															"recursive": true
-														},
-														"formatSettings": {
-															"type": "BinaryReadSettings"
-														}
-													},
-													"sink": {
-														"type": "BinarySink",
-														"storeSettings": {
-															"type": "AzureBlobFSWriteSettings"
-														}
-													},
-													"enableStaging": false
-												},
-												"inputs": [
-													{
-														"referenceName": "ds_blob_binary",
-														"type": "DatasetReference",
-														"parameters": {
-															"file_name": "@item().source_file_name",
-															"file_dir": "@item().source_file_dir"
-														}
-													}
-												],
-												"outputs": [
-													{
-														"referenceName": "ds_datalake_binary",
-														"type": "DatasetReference",
-														"parameters": {
-															"filename": {
-																"value": "@item().sink_file_name",
-																"type": "Expression"
-															},
-															"file_dir": {
-																"value": "@concat(item().sink_file_dir,'/dw_load_date=',formatDateTime(utcnow(),'yyyy-MM-dd'))",
-																"type": "Expression"
-															}
-														}
-													}
-												]
-											}
-										],
-										"ifTrueActivities": [
-											{
-												"name": "blob to dake copy_zip",
-												"type": "Copy",
-												"dependsOn": [],
-												"policy": {
-													"timeout": "0.12:00:00",
-													"retry": 0,
-													"retryIntervalInSeconds": 30,
-													"secureOutput": false,
-													"secureInput": false
-												},
-												"userProperties": [],
-												"typeProperties": {
-													"source": {
-														"type": "BinarySource",
-														"storeSettings": {
-															"type": "AzureBlobStorageReadSettings",
-															"recursive": true
-														},
-														"formatSettings": {
-															"type": "BinaryReadSettings",
-															"compressionProperties": {
-																"type": "ZipDeflateReadSettings",
-																"preserveZipFileNameAsFolder": false
-															}
-														}
-													},
-													"sink": {
-														"type": "BinarySink",
-														"storeSettings": {
-															"type": "AzureBlobFSWriteSettings",
-															"copyBehavior": "PreserveHierarchy"
-														}
-													},
-													"enableStaging": false
-												},
-												"inputs": [
-													{
-														"referenceName": "ds_blob_binary_for_zip",
-														"type": "DatasetReference",
-														"parameters": {
-															"file_dir": {
-																"value": "@item().source_file_dir",
-																"type": "Expression"
-															},
-															"file_name": {
-																"value": "@item().source_file_name",
-																"type": "Expression"
-															}
-														}
-													}
-												],
-												"outputs": [
-													{
-														"referenceName": "ds_datalake_for_zip",
-														"type": "DatasetReference",
-														"parameters": {
-															"file_dir": {
-																"value": "@concat(item().sink_file_dir,'/dw_load_date=',formatDateTime(utcnow(),'yyyy-MM-dd'))",
-																"type": "Expression"
-															}
-														}
-													}
-												]
-											}
-										]
-									}
-								}
-							]
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"annotations": [],
-				"lastPublishTime": "2024-01-28T10:26:59Z"
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/ds_lookup_blob_to_dlake_config_file')]",
-				"[concat(variables('factoryId'), '/datasets/ds_blob_binary')]",
-				"[concat(variables('factoryId'), '/datasets/ds_datalake_binary')]",
-				"[concat(variables('factoryId'), '/datasets/ds_blob_binary_for_zip')]",
-				"[concat(variables('factoryId'), '/datasets/ds_datalake_for_zip')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/delta_airline_ingesion_sql_to_datalake')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "sql to datakale config lookup",
-						"type": "Lookup",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "JsonSource",
-								"storeSettings": {
-									"type": "AzureBlobStorageReadSettings",
-									"recursive": true,
-									"enablePartitionDiscovery": false
-								},
-								"formatSettings": {
-									"type": "JsonReadSettings"
-								}
-							},
-							"dataset": {
-								"referenceName": "ds_lookup_sql_to_dlake_config_file_copy1",
-								"type": "DatasetReference",
-								"parameters": {}
-							},
-							"firstRowOnly": false
-						}
-					},
-					{
-						"name": "ForEach1",
-						"type": "ForEach",
-						"dependsOn": [
-							{
-								"activity": "sql to datakale config lookup",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('sql to datakale config lookup').output.value",
-								"type": "Expression"
-							},
-							"isSequential": true,
-							"activities": [
-								{
-									"name": "sql to dake copy",
-									"type": "Copy",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"source": {
-											"type": "AzureSqlSource",
-											"queryTimeout": "02:00:00",
-											"partitionOption": "None"
-										},
-										"sink": {
-											"type": "ParquetSink",
-											"storeSettings": {
-												"type": "AzureBlobFSWriteSettings"
-											},
-											"formatSettings": {
-												"type": "ParquetWriteSettings"
-											}
-										},
-										"enableStaging": false,
-										"translator": {
-											"type": "TabularTranslator",
-											"typeConversion": true,
-											"typeConversionSettings": {
-												"allowDataTruncation": true,
-												"treatBooleanAsNumber": false
-											}
-										}
-									},
-									"inputs": [
-										{
-											"referenceName": "ds_Azure_Sql_Database_dataset",
-											"type": "DatasetReference",
-											"parameters": {
-												"table_name": {
-													"value": "@item().table_name",
-													"type": "Expression"
-												},
-												"db_name": {
-													"value": "@item().db_name",
-													"type": "Expression"
-												}
-											}
-										}
-									],
-									"outputs": [
-										{
-											"referenceName": "ds_Datalake_Parquet",
-											"type": "DatasetReference",
-											"parameters": {
-												"filename": {
-													"value": "@concat(item().sink_file_name,'_',formatDateTime(utcNow(),'yyyy-MM-dd'),'.snappy.parquet')",
-													"type": "Expression"
-												},
-												"file_dir": {
-													"value": "@concat('delta-air-raw-zone/',item().sink_dir,'/dw_load_date=',formatDateTime(utcNow(),'yyyy-MM-dd'))",
-													"type": "Expression"
-												}
-											}
-										}
-									]
-								}
-							]
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"annotations": [],
-				"lastPublishTime": "2024-01-28T11:05:32Z"
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/ds_lookup_sql_to_dlake_config_file_copy1')]",
-				"[concat(variables('factoryId'), '/datasets/ds_Azure_Sql_Database_dataset')]",
-				"[concat(variables('factoryId'), '/datasets/ds_Datalake_Parquet')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/master-data-pipeline')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Blob to Datalake_Raw",
-						"type": "ExecutePipeline",
-						"dependsOn": [],
-						"policy": {
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "delta_airline_ingesion_blob_to_datalake",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": false,
-							"parameters": {}
-						}
-					},
-					{
-						"name": "Execute Pipeline1",
-						"type": "ExecutePipeline",
-						"dependsOn": [
-							{
-								"activity": "Blob to Datalake_Raw",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "delta_airline_ingesion_api_to_datalake",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": false,
-							"parameters": {}
-						}
-					},
-					{
-						"name": "Execute Pipeline2",
-						"type": "ExecutePipeline",
-						"dependsOn": [
-							{
-								"activity": "Execute Pipeline1",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "delta_airline_ingesion_sql_to_datalake",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {}
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"annotations": [],
-				"lastPublishTime": "2024-01-28T11:06:39Z"
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/delta_airline_ingesion_blob_to_datalake')]",
-				"[concat(variables('factoryId'), '/pipelines/delta_airline_ingesion_api_to_datalake')]",
-				"[concat(variables('factoryId'), '/pipelines/delta_airline_ingesion_sql_to_datalake')]"
 			]
 		}
 	]
