@@ -1,0 +1,53 @@
+{
+	"name": "ds_deltalake_final_table",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_DeltaLake",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureDatabricksDeltaLakeDataset",
+		"typeProperties": {
+			"database": "deltadb",
+			"table": "app_view"
+		},
+		"schema": [
+			{
+				"name": "FlightNum",
+				"type": "integer"
+			},
+			{
+				"name": "aircraft_type",
+				"type": "string"
+			},
+			{
+				"name": "manufacturer",
+				"type": "string"
+			},
+			{
+				"name": "origin_city",
+				"type": "string"
+			},
+			{
+				"name": "origin_country",
+				"type": "string"
+			},
+			{
+				"name": "dest_city",
+				"type": "string"
+			},
+			{
+				"name": "dest_country",
+				"type": "string"
+			},
+			{
+				"name": "is_delayed",
+				"type": "integer"
+			},
+			{
+				"name": "dw_load_date",
+				"type": "date"
+			}
+		]
+	}
+}
