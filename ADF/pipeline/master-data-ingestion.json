@@ -1,5 +1,5 @@
 {
-	"name": "master-data-pipeline",
+	"name": "master-data-ingestion",
 	"properties": {
 		"activities": [
 			{
