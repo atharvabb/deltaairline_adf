@@ -1,0 +1,19 @@
+{
+	"name": "ls_AzureDatabricks",
+	"properties": {
+		"annotations": [],
+		"type": "AzureDatabricks",
+		"typeProperties": {
+			"domain": "https://adb-687768538906932.12.azuredatabricks.net",
+			"accessToken": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "delta_airline_keyvault",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "databricks-adf-token"
+			},
+			"existingClusterId": "0128-115236-sjfsekx6"
+		}
+	}
+}
