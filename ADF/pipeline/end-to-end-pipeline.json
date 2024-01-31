@@ -49,8 +49,8 @@
 				}
 			},
 			{
-				"name": "Copy data1",
-				"type": "Copy",
+				"name": "Web1",
+				"type": "WebActivity",
 				"dependsOn": [
 					{
 						"activity": "Notebook1",
@@ -68,58 +68,9 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"source": {
-						"type": "AzureDatabricksDeltaLakeSource",
-						"exportSettings": {
-							"type": "AzureDatabricksDeltaLakeExportCommand"
-						}
-					},
-					"sink": {
-						"type": "AzureSqlSink",
-						"writeBehavior": "insert",
-						"sqlWriterUseTableLock": false
-					},
-					"enableStaging": false
-				},
-				"inputs": [
-					{
-						"referenceName": "ds_deltalake_final_table",
-						"type": "DatasetReference"
-					}
-				],
-				"outputs": [
-					{
-						"referenceName": "ds_Azure_Sql_Database_dataset",
-						"type": "DatasetReference",
-						"parameters": {
-							"table_name": "dbo",
-							"db_name": "app_view"
-						}
-					}
-				]
-			},
-			{
-				"name": "Web1",
-				"type": "WebActivity",
-				"dependsOn": [
-					{
-						"activity": "Copy data1",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
 					"method": "POST",
-					"url": "https://prod-93.eastus.logic.azure.com:443/workflows/a4209fe3e22d4809822d67443e986a00/triggers/manual/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=CPuEshl04ybf0kVQ56xDoDc6pHgTfWCX8b_OwDsQ1u4"
+					"url": "https://prod-93.eastus.logic.azure.com:443/workflows/a4209fe3e22d4809822d67443e986a00/triggers/manual/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=CPuEshl04ybf0kVQ56xDoDc6pHgTfWCX8b_OwDsQ1u4",
+					"body": "1"
 				}
 			}
 		],
