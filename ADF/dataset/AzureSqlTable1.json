@@ -1,0 +1,55 @@
+{
+	"name": "AzureSqlTable1",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_azure_sql_database",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "FlightNum",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "aircraft_type",
+				"type": "varchar"
+			},
+			{
+				"name": "manufacturer",
+				"type": "varchar"
+			},
+			{
+				"name": "origin_city",
+				"type": "varchar"
+			},
+			{
+				"name": "origin_country",
+				"type": "varchar"
+			},
+			{
+				"name": "dest_city",
+				"type": "varchar"
+			},
+			{
+				"name": "dest_country",
+				"type": "varchar"
+			},
+			{
+				"name": "is_delayed",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "dw_load_date",
+				"type": "date"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "app_view"
+		}
+	}
+}
